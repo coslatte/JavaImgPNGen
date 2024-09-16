@@ -8,4 +8,9 @@ public class Idat extends Chunk {
         super(ChunkType.IDAT);
 
     }
+
+    @Override
+    public void printData() {
+
+    }
 }

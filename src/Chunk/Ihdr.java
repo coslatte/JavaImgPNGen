@@ -3,15 +3,18 @@ package Chunk;
 import Utils.ChunkType;
 import org.joou.UByte;
 import org.joou.UInteger;
+import org.joou.UNumber;
+
+import java.util.zip.CRC32;
 
 public class Ihdr extends Chunk {
     UInteger width; // Ancho de la imagen en pixeles.
     UInteger height; // Largo de la imagen en pixeles.
     UByte bitDepth; // Numero de bits por sample o por paleta (no por pixel).
     UByte colorType; // Representa el tipo de color de la imagen.
-    UByte compressionMethod; // Indica el metodo de compresion usado a la imagen.
-    UByte filterMethod; // Indica el metodo de procesado aplicado a la imagen despues de la compresion.
-    UByte interlaceMethod; // Indica el orden de transicion de los datos de la imagen: no-interlance || Adam7-interlance.
+    UByte compressionMethod; // Indica el method de compresión usado a la imagen.
+    UByte filterMethod; // Indica el method de procesado aplicado a la imagen después de la compresión.
+    UByte interlaceMethod; // Indica el orden de transición de los datos de la imagen: no-interlace || Adam7-interlace.
 
     public Ihdr(long width, long height, short bitDepth, short colorType, short compressionMethod, short filterMethod, short interlaceMethod) throws Exception {
         super(ChunkType.IHDR);
@@ -43,7 +46,7 @@ public class Ihdr extends Chunk {
         }
 
         if (!(interlaceMethod == 0 || interlaceMethod == 1)) {
-            throw new Exception("Interlace metho has to be between 0 or 1");
+            throw new Exception("Interlace method has to be between 0 or 1");
         } else {
             this.interlaceMethod = UByte.valueOf(interlaceMethod);
         }
@@ -57,6 +60,15 @@ public class Ihdr extends Chunk {
         this.chunkData.add(this.interlaceMethod);
 
         this.length = UInteger.valueOf(this.chunkData.size());
+        this.crc = calculateCrc32(this.chunkType, this.chunkData);
     }
 
+    @Override
+    public void printData() {
+        StringBuffer sb = new StringBuffer();
+        for (UNumber uN : this.chunkData) {
+            sb.append(uN.toString());
+        }
+        System.out.println(sb);
+    }
 }

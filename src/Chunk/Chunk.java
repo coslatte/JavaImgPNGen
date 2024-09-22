@@ -28,7 +28,18 @@ public abstract class Chunk {
         this.crc = UInteger.valueOf(0); // Posteriormente generado por CRC Algoritmo.
     }
 
-    protected UInteger calculateCrc32(UInteger chunkType, ArrayList<UNumber> chunkData) {
+    // Crea un array de bytes a partir de un Integer (chunkType).
+    private static byte[] intToByte(int value) {
+        return ByteBuffer.allocate(4).putInt(value).array();
+    }
+
+    public abstract void printData();
+
+    public UInteger getCrc(UInteger chunkType, ArrayList<UNumber> chunkData) {
+        return calculateCrc32(chunkType, chunkData);
+    }
+
+    private UInteger calculateCrc32(UInteger chunkType, ArrayList<UNumber> chunkData) {
         CRC32 crc32 = new CRC32();
         crc32.update(chunkType.intValue());
         for (UNumber uN : chunkData) {
@@ -42,23 +53,34 @@ public abstract class Chunk {
         return UInteger.valueOf(crc32.getValue());
     }
 
-    // Crea un array de bytes a partir de un Integer (chunkType).
-    private static byte[] intToByte(int value) {
-        return ByteBuffer.allocate(4).putInt(value).array();
-    }
-
-    public abstract void printData();
-
-    public UInteger getCrc() {
-        return crc;
-    }
-
     public UInteger getLength() {
-        return length;
+        return calculateLength();
     }
 
-    public ArrayList<UNumber> getData() {
-        return this.chunkData;
+    private UInteger calculateLength() {
+        long bytesAmount = 0;
+        long integersAmount = 0;
+        for (UNumber uN : chunkData) {
+            if (uN instanceof UByte) {
+                bytesAmount++;
+            } else if (uN instanceof UInteger) {
+                integersAmount++;
+            }
+        }
+        return UInteger.valueOf(bytesAmount + integersAmount * 4);
+    }
+
+    public ArrayList<UNumber> getChunkData() {
+        return chunkData;
+    }
+
+    public ArrayList<UNumber> getAllContent() {
+        ArrayList<UNumber> allContent = new ArrayList<>();
+        allContent.add(length);
+        allContent.add(chunkType);
+        allContent.addAll(chunkData);
+        allContent.add(crc);
+        return allContent;
     }
 
     public byte[] getDataAsBytes() {

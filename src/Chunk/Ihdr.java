@@ -58,9 +58,8 @@ public class Ihdr extends Chunk {
         this.chunkData.add(this.compressionMethod);
         this.chunkData.add(this.filterMethod);
         this.chunkData.add(this.interlaceMethod);
-
-        this.length = UInteger.valueOf(this.chunkData.size());
-        this.crc = calculateCrc32(this.chunkType, this.chunkData);
+        this.length = getLength();
+        this.crc = getCrc(chunkType, chunkData);
     }
 
     @Override
